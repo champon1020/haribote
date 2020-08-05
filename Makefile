@@ -1,6 +1,6 @@
 QEMU_PATH = ./qemu
 
-IMG = ./helloos.img
+IMG = ./src/01/helloos.img
 
 run: $(IMG)
 	cp $(IMG) $(QEMU_PATH)/fdimage0.bin
