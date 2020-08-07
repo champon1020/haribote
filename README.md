@@ -11,9 +11,9 @@ The project of my studying about making Operation System.
 
 ## Reference Repositories:
 
-- https://github.com/HariboteOS (tolsrc)
+- https://github.com/HariboteOS
 
-  Use for the environment of ubuntu.
+  Use for the environment of ubuntu (z_tools_linux).
 
 - https://github.com/nekketsuuu/haribote
 
