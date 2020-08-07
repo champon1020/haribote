@@ -53,7 +53,7 @@ retry:
 		MOV		BX,0
 		MOV		DL,0x00			; Aドライブ
 		INT		0x13			; ディスクBIOS呼び出し
-		JNC		fin
+		JNC		next
 		ADD		SI,1
 		CMP		SI,5
 		JAE		error
@@ -77,6 +77,8 @@ next:
 		ADD		CH,1
 		CMP		CH,CYLS
 		JB		readloop
+
+        JMP     0xc200
 
 fin:
 		HLT						; 何かあるまでCPUを停止させる
