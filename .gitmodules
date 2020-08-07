@@ -1,0 +1,3 @@
+[submodule "tolsrc"]
+	path = tolsrc
+	url = git@github.com:HariboteOS/tolsrc.git
