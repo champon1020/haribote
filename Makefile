@@ -13,6 +13,7 @@ BIM2HRB = $(TOOLS)/bim2hrb
 IPL = ./src/ipl.nas
 BIN = ./build/ipl.bin
 ASM = ./src/asmhead.nas
+FUNC = ./src/naskfunc.nas
 ASM_BIN = ./build/asmhead.bin
 SYS = ./build/haribote.sys
 
@@ -42,12 +43,15 @@ bootpack.nas: ./tmp/bootpack.gas
 bootpack.obj: ./tmp/bootpack.nas
 	$(NASK) $< ./tmp/$@
 
-bootpack.bim: ./tmp/bootpack.obj
+naskfunc.obj: $(FUNC)
+	$(NASK) $< ./tmp/$@
+
+bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj
 	$(OBJ2BIM) @$(RULE_FILE) \
 		out:./tmp/$@ \
 		stack:3136k \
 		map:./tmp/bootpack.map \
-		$<
+		$< ./tmp/naskfunc.obj
 
 bootpack.hrb: ./tmp/bootpack.bim
 	$(BIM2HRB) $< $(HRB) 0
@@ -56,6 +60,7 @@ compile:
 	@make bootpack.gas
 	@make bootpack.nas
 	@make bootpack.obj
+	@make naskfunc.obj
 	@make bootpack.bim
 	@make bootpack.hrb
 
