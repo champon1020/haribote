@@ -7,7 +7,23 @@ _HariMain:
 	pushl	%ebp
 	movl	%esp, %ebp
 	subl	$8, %esp
+	movl	$655360, -4(%ebp)
 L2:
-	call	_io_hlt
+	cmpl	$720895, -4(%ebp)
+	jle	L5
+	jmp	L3
+L5:
+	subl	$8, %esp
+	pushl	$0
+	pushl	-4(%ebp)
+	call	_write_mem8
+	addl	$16, %esp
+	leal	-4(%ebp), %eax
+	incl	(%eax)
 	jmp	L2
+L3:
+	call	_io_hlt
+	leave
+	ret
 	.def	_io_hlt;	.scl	2;	.type	32;	.endef
+	.def	_write_mem8;	.scl	2;	.type	32;	.endef

@@ -35,7 +35,7 @@ img: $(BIN) $(SYS)
 		imgout:$(IMG)
 
 bootpack.gas: $(BOTPAK)
-	$(CC1) $< -o ./tmp/$@
+	$(CC1) -o ./tmp/$@ $<
 
 bootpack.nas: ./tmp/bootpack.gas
 	$(GAS2NASK) $< ./tmp/$@
@@ -59,8 +59,8 @@ bootpack.hrb: ./tmp/bootpack.bim
 compile:
 	@make bootpack.gas
 	@make bootpack.nas
-	@make bootpack.obj
 	@make naskfunc.obj
+	@make bootpack.obj
 	@make bootpack.bim
 	@make bootpack.hrb
 

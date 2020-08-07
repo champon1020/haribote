@@ -3,6 +3,7 @@
 [OPTIMIZE 1]
 [OPTION 1]
 [BITS 32]
+	EXTERN	_write_mem8
 	EXTERN	_io_hlt
 [FILE "bootpack.c"]
 [SECTION .text]
@@ -12,6 +13,21 @@ _HariMain:
 	PUSH	EBP
 	MOV	EBP,ESP
 	SUB	ESP,8
+	MOV	DWORD [-4+EBP],655360
 L2:
-	CALL	_io_hlt
+	CMP	DWORD [-4+EBP],720895
+	JLE	L5
+	JMP	L3
+L5:
+	SUB	ESP,8
+	PUSH	0
+	PUSH	DWORD [-4+EBP]
+	CALL	_write_mem8
+	ADD	ESP,16
+	LEA	EAX,DWORD [-4+EBP]
+	INC	DWORD [EAX]
 	JMP	L2
+L3:
+	CALL	_io_hlt
+	LEAVE
+	RET
