@@ -1,36 +1,71 @@
-TOLSRC = ./tolsrc
-TOLSRC_OK = $(TOLSRC)/ok
-EDIMG = $(TOLSRC_OK)/edimg
+TOOLS = z_tools
 
-IPL_NAS = ./src/ipl.nas
-IPL_BIN = ./build/ipl.bin
-HARIBOTE_NAS = ./src/haribote.nas
-HARIBOTE_SYS = ./build/haribote.sys
-HARIBOTE_IMG = ./src/haribote.img
+TEK = $(TOOLS)/fdimg0at.tek
+RULE_FILE = $(TOOLS)/haribote/haribote.rul
 
-run.helloos: ./src/helloos.img
-	qemu-system-i386 -drive file=./src/helloos.img,format=raw,if=floppy
+NASK = $(TOOLS)/nask
+EDIMG = $(TOOLS)/edimg
+CC1 = $(TOOLS)/gocc1
+GAS2NASK = $(TOOLS)/gas2nask
+OBJ2BIM = $(TOOLS)/obj2bim
+BIM2HRB = $(TOOLS)/bim2hrb
 
-ipl.bin: $(IPL_NAS)
-	nasm $(IPL_NAS) -o $(IPL_BIN) -l ./build/ipl.lst
+IPL = ./src/ipl.nas
+BIN = ./build/ipl.bin
+ASM = ./src/asmhead.nas
+ASM_BIN = ./build/asmhead.bin
+SYS = ./build/haribote.sys
 
-haribote.sys: $(HARIBOTE_NAS)
-	nasm $(HARIBOTE_NAS) -o $(HARIBOTE_SYS) -l ./build/haribote.lst
+BOTPAK = ./src/bootpack.c
+HRB = ./build/bootpack.hrb
+IMG = ./src/haribote.img
 
-haribote.img: $(IPL_BIN) $(HARIBOTE_SYS)
-	$(EDIMG) imgin:$(TOLSRC)/edimg0j/fdimg0at.tek \
-		wbinimg src:$(IPL_BIN) len:512 from:0 to:0 \
-		copy from:$(HARIBOTE_SYS) to:@: \
-		imgout:$(HARIBOTE_IMG)
+bin: $(IPL) $(ASM)
+	$(NASK) $(IPL) $(BIN) ./build/ipl.lst
+	$(NASK) $(ASM) $(ASM_BIN) ./build/asmhead.lst
+
+sys: $(ASM_BIN) $(HRB)
+	cat $(ASM_BIN) $(HRB) > $(SYS)
+
+img: $(BIN) $(SYS)
+	$(EDIMG) imgin:$(TEK) \
+		wbinimg src:$(BIN) len:512 from:0 to:0 \
+		copy from:$(SYS) to:@: \
+		imgout:$(IMG)
+
+bootpack.gas: $(BOTPAK)
+	$(CC1) $< -o ./tmp/$@
+
+bootpack.nas: ./tmp/bootpack.gas
+	$(GAS2NASK) $< ./tmp/$@
+
+bootpack.obj: ./tmp/bootpack.nas
+	$(NASK) $< ./tmp/$@
+
+bootpack.bim: ./tmp/bootpack.obj
+	$(OBJ2BIM) @$(RULE_FILE) \
+		out:./tmp/$@ \
+		stack:3136k \
+		map:./tmp/bootpack.map \
+		$<
+
+bootpack.hrb: ./tmp/bootpack.bim
+	$(BIM2HRB) $< $(HRB) 0
+
+compile:
+	@make bootpack.gas
+	@make bootpack.nas
+	@make bootpack.obj
+	@make bootpack.bim
+	@make bootpack.hrb
 
 run:
-	@make ipl.bin
-	@make haribote.sys
-	@make haribote.img
-	qemu-system-i386 -drive file=$(HARIBOTE_IMG),format=raw,if=floppy
+	@make bin
+	@make compile
+	@make sys
+	@make img
+	qemu-system-i386 -drive file=$(IMG),format=raw,if=floppy
 
 clean:
-	rm $(IPL_BIN)
-	rm ./build/ipl.lst
-	rm $(HARIBOTE_SYS)
-	rm ./build/haribote.lst
+	rm ./build/*
+	rm ./tmp/*
