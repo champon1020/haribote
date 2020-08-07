@@ -13,11 +13,12 @@ L2:
 	jle	L5
 	jmp	L3
 L5:
-	subl	$8, %esp
-	pushl	$0
-	pushl	-4(%ebp)
-	call	_write_mem8
-	addl	$16, %esp
+	movl	-4(%ebp), %eax
+	movl	%eax, -8(%ebp)
+	movl	-8(%ebp), %edx
+	movb	-4(%ebp), %al
+	andl	$15, %eax
+	movb	%al, (%edx)
 	leal	-4(%ebp), %eax
 	incl	(%eax)
 	jmp	L2
@@ -26,4 +27,3 @@ L3:
 	leave
 	ret
 	.def	_io_hlt;	.scl	2;	.type	32;	.endef
-	.def	_write_mem8;	.scl	2;	.type	32;	.endef
