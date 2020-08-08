@@ -7,15 +7,17 @@ _HariMain:
 	pushl	%ebp
 	movl	%esp, %ebp
 	subl	$8, %esp
-	movl	$655360, -4(%ebp)
+	movl	$655360, -8(%ebp)
+	call	_init_palette
+	movl	$0, -4(%ebp)
 L2:
-	cmpl	$720895, -4(%ebp)
+	cmpl	$65535, -4(%ebp)
 	jle	L5
 	jmp	L3
 L5:
 	movl	-4(%ebp), %eax
-	movl	%eax, -8(%ebp)
 	movl	-8(%ebp), %edx
+	addl	%eax, %edx
 	movb	-4(%ebp), %al
 	andl	$15, %eax
 	movb	%al, (%edx)
@@ -26,4 +28,140 @@ L3:
 	call	_io_hlt
 	leave
 	ret
+	.data
+_table_rgb.0:
+	.byte	0
+	.byte	0
+	.byte	0
+	.byte	-1
+	.byte	0
+	.byte	0
+	.byte	0
+	.byte	-1
+	.byte	0
+	.byte	-1
+	.byte	-1
+	.byte	0
+	.byte	0
+	.byte	0
+	.byte	-1
+	.byte	-1
+	.byte	0
+	.byte	-1
+	.byte	0
+	.byte	-1
+	.byte	-1
+	.byte	-1
+	.byte	-1
+	.byte	-1
+	.byte	-58
+	.byte	-58
+	.byte	-58
+	.byte	-124
+	.byte	0
+	.byte	0
+	.byte	0
+	.byte	-124
+	.byte	0
+	.byte	-124
+	.byte	-124
+	.byte	0
+	.byte	0
+	.byte	0
+	.byte	100
+	.byte	-124
+	.byte	0
+	.byte	-124
+	.byte	0
+	.byte	-124
+	.byte	-124
+	.byte	-124
+	.byte	-124
+	.byte	-124
+	.text
+	.balign 2
+.globl _init_palette
+	.def	_init_palette;	.scl	2;	.type	32;	.endef
+_init_palette:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	subl	$4, %esp
+	pushl	$_table_rgb.0
+	pushl	$15
+	pushl	$0
+	call	_set_palette
+	addl	$16, %esp
+	leave
+	ret
+	.balign 2
+.globl _set_palette
+	.def	_set_palette;	.scl	2;	.type	32;	.endef
+_set_palette:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	call	_io_load_eflags
+	movl	%eax, -8(%ebp)
+	call	_io_cli
+	subl	$8, %esp
+	pushl	8(%ebp)
+	pushl	$968
+	call	_io_out8
+	addl	$16, %esp
+	movl	8(%ebp), %eax
+	movl	%eax, -4(%ebp)
+L8:
+	movl	-4(%ebp), %eax
+	cmpl	12(%ebp), %eax
+	jle	L11
+	jmp	L9
+L11:
+	subl	$8, %esp
+	movl	16(%ebp), %eax
+	movb	(%eax), %al
+	shrb	$2, %al
+	andl	$255, %eax
+	pushl	%eax
+	pushl	$969
+	call	_io_out8
+	addl	$16, %esp
+	subl	$8, %esp
+	movl	16(%ebp), %eax
+	incl	%eax
+	movb	(%eax), %al
+	shrb	$2, %al
+	andl	$255, %eax
+	pushl	%eax
+	pushl	$969
+	call	_io_out8
+	addl	$16, %esp
+	subl	$8, %esp
+	movl	16(%ebp), %eax
+	addl	$2, %eax
+	movb	(%eax), %al
+	shrb	$2, %al
+	andl	$255, %eax
+	pushl	%eax
+	pushl	$969
+	call	_io_out8
+	addl	$16, %esp
+	leal	16(%ebp), %eax
+	addl	$3, (%eax)
+	leal	-4(%ebp), %eax
+	incl	(%eax)
+	jmp	L8
+L9:
+	subl	$12, %esp
+	pushl	-8(%ebp)
+	call	_io_store_eflags
+	addl	$16, %esp
+	leave
+	ret
+	.def	_io_store_eflags;	.scl	2;	.type	32;	.endef
+	.def	_io_out8;	.scl	2;	.type	32;	.endef
+	.def	_io_cli;	.scl	2;	.type	32;	.endef
+	.def	_io_load_eflags;	.scl	2;	.type	32;	.endef
+	.def	_set_palette;	.scl	2;	.type	32;	.endef
 	.def	_io_hlt;	.scl	2;	.type	32;	.endef
+	.def	_init_palette;	.scl	2;	.type	32;	.endef
