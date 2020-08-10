@@ -1,4 +1,5 @@
 TOOLS = z_tools
+TOLSRC = tolsrc/ok
 
 TEK = $(TOOLS)/fdimg0at.tek
 RULE_FILE = $(TOOLS)/haribote/haribote.rul
@@ -9,6 +10,8 @@ CC1 = $(TOOLS)/gocc1
 GAS2NASK = $(TOOLS)/gas2nask
 OBJ2BIM = $(TOOLS)/obj2bim
 BIM2HRB = $(TOOLS)/bim2hrb
+BIN2OBJ = $(TOOLS)/bin2obj
+MKFONT = $(TOOLS)/makefont
 
 IPL = ./src/ipl.nas
 BIN = ./build/ipl.bin
@@ -51,16 +54,27 @@ bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj
 		out:./tmp/$@ \
 		stack:3136k \
 		map:./tmp/bootpack.map \
-		$< ./tmp/naskfunc.obj
+		$< ./tmp/naskfunc.obj ./tmp/hankaku.obj
 
 bootpack.hrb: ./tmp/bootpack.bim
 	$(BIM2HRB) $< $(HRB) 0
+
+hankaku.bin: ./src/hankaku.txt
+	$(MKFONT) $< ./tmp/$@
+
+hankaku.obj: ./tmp/hankaku.bin
+	$(BIN2OBJ) $< ./tmp/$@ _$(basename $@)
+
+makefont:
+	@make hankaku.bin
+	@make hankaku.obj
 
 compile:
 	@make bootpack.gas
 	@make bootpack.nas
 	@make naskfunc.obj
 	@make bootpack.obj
+	@make makefont
 	@make bootpack.bim
 	@make bootpack.hrb
 

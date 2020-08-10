@@ -1,3 +1,6 @@
 [submodule "z_tools"]
 	path = z_tools
 	url = git@github.com:HariboteOS/z_tools_linux.git
+[submodule "tolsrc"]
+	path = tolsrc
+	url = git@github.com:HariboteOS/tolsrc.git
