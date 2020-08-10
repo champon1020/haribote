@@ -1,22 +1,9 @@
 	.file	"bootpack.c"
 	.data
-_font_A.0:
-	.byte	0
-	.byte	24
-	.byte	24
-	.byte	24
-	.byte	24
-	.byte	36
-	.byte	36
-	.byte	36
-	.byte	36
-	.byte	126
-	.byte	66
-	.byte	66
-	.byte	66
-	.byte	-25
-	.byte	0
-	.byte	0
+LC0:
+	.ascii "ABC 123\0"
+LC1:
+	.ascii "HARIBOTE OS\0"
 	.text
 	.balign 2
 .globl _HariMain
@@ -39,16 +26,40 @@ _HariMain:
 	call	_init_screen
 	addl	$16, %esp
 	subl	$8, %esp
-	pushl	$_font_A.0
+	pushl	$LC0
 	pushl	$7
-	pushl	$10
-	pushl	$10
+	pushl	$8
+	pushl	$8
 	movl	-4(%ebp), %eax
 	movswl	4(%eax),%eax
 	pushl	%eax
 	movl	-4(%ebp), %eax
 	pushl	8(%eax)
-	call	_putfont8
+	call	_putfonts8_asc
+	addl	$32, %esp
+	subl	$8, %esp
+	pushl	$LC1
+	pushl	$7
+	pushl	$30
+	pushl	$30
+	movl	-4(%ebp), %eax
+	movswl	4(%eax),%eax
+	pushl	%eax
+	movl	-4(%ebp), %eax
+	pushl	8(%eax)
+	call	_putfonts8_asc
+	addl	$32, %esp
+	subl	$8, %esp
+	pushl	$LC1
+	pushl	$0
+	pushl	$31
+	pushl	$31
+	movl	-4(%ebp), %eax
+	movswl	4(%eax),%eax
+	pushl	%eax
+	movl	-4(%ebp), %eax
+	pushl	8(%eax)
+	call	_putfonts8_asc
 	addl	$32, %esp
 	call	_io_hlt
 	leave
@@ -197,8 +208,46 @@ L14:
 L11:
 	leave
 	ret
+	.balign 2
+.globl _putfonts8_asc
+	.def	_putfonts8_asc;	.scl	2;	.type	32;	.endef
+_putfonts8_asc:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	movl	24(%ebp), %eax
+	movb	%al, -1(%ebp)
+L25:
+	movl	28(%ebp), %eax
+	cmpb	$0, (%eax)
+	jne	L28
+	jmp	L24
+L28:
+	subl	$8, %esp
+	movl	28(%ebp), %eax
+	movb	(%eax), %al
+	andl	$255, %eax
+	sall	$4, %eax
+	addl	$_hankaku, %eax
+	pushl	%eax
+	movsbl	-1(%ebp),%eax
+	pushl	%eax
+	pushl	20(%ebp)
+	pushl	16(%ebp)
+	pushl	12(%ebp)
+	pushl	8(%ebp)
+	call	_putfont8
+	addl	$32, %esp
+	leal	16(%ebp), %eax
+	addl	$8, (%eax)
+	leal	28(%ebp), %eax
+	incl	(%eax)
+	jmp	L25
+L24:
+	leave
+	ret
 	.data
-_table_rgb.1:
+_table_rgb.0:
 	.byte	0
 	.byte	0
 	.byte	0
@@ -256,7 +305,7 @@ _init_palette:
 	movl	%esp, %ebp
 	subl	$8, %esp
 	subl	$4, %esp
-	pushl	$_table_rgb.1
+	pushl	$_table_rgb.0
 	pushl	$15
 	pushl	$0
 	call	_set_palette
@@ -280,12 +329,12 @@ _set_palette:
 	addl	$16, %esp
 	movl	8(%ebp), %eax
 	movl	%eax, -4(%ebp)
-L26:
+L31:
 	movl	-4(%ebp), %eax
 	cmpl	12(%ebp), %eax
-	jle	L29
-	jmp	L27
-L29:
+	jle	L34
+	jmp	L32
+L34:
 	subl	$8, %esp
 	movl	16(%ebp), %eax
 	movb	(%eax), %al
@@ -319,8 +368,8 @@ L29:
 	addl	$3, (%eax)
 	leal	-4(%ebp), %eax
 	incl	(%eax)
-	jmp	L26
-L27:
+	jmp	L31
+L32:
 	subl	$12, %esp
 	pushl	-8(%ebp)
 	call	_io_store_eflags
@@ -560,6 +609,6 @@ _init_screen:
 	.def	_io_load_eflags;	.scl	2;	.type	32;	.endef
 	.def	_set_palette;	.scl	2;	.type	32;	.endef
 	.def	_io_hlt;	.scl	2;	.type	32;	.endef
-	.def	_putfont8;	.scl	2;	.type	32;	.endef
+	.def	_putfonts8_asc;	.scl	2;	.type	32;	.endef
 	.def	_init_screen;	.scl	2;	.type	32;	.endef
 	.def	_init_palette;	.scl	2;	.type	32;	.endef
