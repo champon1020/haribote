@@ -25,10 +25,12 @@ void io_store_eflags(int eflags);
 void init_palette(void);
 void init_screen(char *vram, int x, int y);
 void set_palette(int start, int end, unsigned char *rgb);
+void init_mouse_cursor8(char *mouse, char bc);
 
 void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
+void putblock8_8(char *vram, int vxsize, int pxsize, int pysize, int px0, int py0, char *buf, int bxsize);
 
 struct BOOTINFO {
   char cyls, leds, vmode, reserve;
@@ -39,13 +41,20 @@ struct BOOTINFO {
 void HariMain(void)
 {
   struct BOOTINFO *binfo;
+  char s[32], mcursor[256];
+  int mx, my;
   
   init_palette();
   binfo = (struct BOOTINFO *) 0x0ff0;
   init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-  putfonts8_asc(binfo->vram, binfo->scrnx, 8, 8, COL8_FFFFFF, "ABC 123");
-  putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "HARIBOTE OS");
-  putfonts8_asc(binfo->vram, binfo->scrnx, 31, 31, COL8_000000, "HARIBOTE OS");
+  init_mouse_cursor8(mcursor, COL8_008484);
+
+  mx = (binfo->scrnx - 16) / 2;
+  my = (binfo->scrny - 28 - 16) / 2;
+  putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
+
+  sprintf(s, "(%d, %d)", mx, my);
+  putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
   io_hlt();
 }
@@ -86,6 +95,17 @@ void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s
   for(; *s != 0x00; s++){
     putfont8(vram, xsize, x, y, c, hankaku + *s * 16);
     x += 8;
+  }
+  return;
+}
+
+void putblock8_8(char *vram, int vxsize, int pxsize, int pysize, int px0, int py0, char *buf, int bxsize)
+{
+  int x, y;
+  for(y=0; y<pysize; y++){
+    for(x=0; x<pxsize; x++){
+      vram[(py0 + y)*vxsize + px0 + x] = buf[y*bxsize + x];
+    }
   }
   return;
 }
@@ -149,5 +169,41 @@ void init_screen(char *vram, int x, int y)
   boxfill8(vram, x, COL8_FFFFFF, x-47, y-3, x-4, y-3);
   boxfill8(vram, x, COL8_FFFFFF, x-3, y-24, x-3, y-3);
 
+  return;
+}
+
+void init_mouse_cursor8(char *mouse, char bc)
+{
+  static char cursor[16][16] = {"**************..",
+                                "*OOOOOOOOOOO*...",
+                                "*OOOOOOOOOO*....",
+                                "*OOOOOOOOO*.....",
+                                "*OOOOOOOO*......",
+                                "*OOOOOOO*.......",
+                                "*OOOOOOO*.......",
+                                "*OOOOOOOO*......",
+                                "*OOOO**OOO*.....",
+                                "*OOO*..*OOO*....",
+                                "*OO*....*OOO*...",
+                                "*O*......*OOO*..",
+                                "**........*OOO*.",
+                                "*..........*OOO*",
+                                "............*OO*",
+                                ".............***"};
+  int x, y;
+  
+  for(y=0; y<16; y++){
+    for(x=0; x<16; x++){
+      if(cursor[y][x] == '*'){
+        mouse[y*16 + x] = COL8_000000;
+      }
+      if(cursor[y][x] == 'O'){
+        mouse[y*16 + x] = COL8_FFFFFF;
+      }
+      if(cursor[y][x] == '.'){
+        mouse[y*16 + x] = bc;
+      }
+    }
+  }
   return;
 }
