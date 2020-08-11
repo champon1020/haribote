@@ -1,4 +1,4 @@
-text size :   3023(0x00BCF)
+text size :   3477(0x00D95)
 data size :   4448(0x01160)
 bss  size :      0(0x00000)
 
@@ -13,26 +13,31 @@ bss  size :      0(0x00000)
 0x00000326 : _set_palette
 0x000003D8 : _init_screen
 0x00000614 : _init_mouse_cursor8
-0x000006BE : _io_hlt
-0x000006BE : (.text)
-0x000006C0 : _io_cli
-0x000006C2 : _io_sti
-0x000006C7 : _io_in8
-0x000006D2 : _io_in16
-0x000006DE : _io_in32
-0x000006E4 : _io_out8
-0x000006EE : _io_out16
-0x000006F9 : _io_out32
-0x00000703 : _io_load_eflags
-0x00000706 : _io_store_eflags
-0x0000070D : (.text)
-0x0000070D : _HariStartup
-0x00000716 : _sprintf
-0x00000716 : (.text)
-0x0000072A : (.text)
-0x00000766 : _strtoul0
-0x00000839 : (.text)
-0x00000861 : _vsprintf
+0x000006BE : _init_gdtidt
+0x00000796 : _set_segmdesc
+0x00000814 : _set_gatedesc
+0x00000864 : _io_hlt
+0x00000864 : (.text)
+0x00000866 : _io_cli
+0x00000868 : _io_sti
+0x0000086D : _io_in8
+0x00000878 : _io_in16
+0x00000884 : _io_in32
+0x0000088A : _io_out8
+0x00000894 : _io_out16
+0x0000089F : _io_out32
+0x000008A9 : _io_load_eflags
+0x000008AC : _io_store_eflags
+0x000008B3 : _load_gdtr
+0x000008C3 : _load_idtr
+0x000008D3 : (.text)
+0x000008D3 : _HariStartup
+0x000008DC : _sprintf
+0x000008DC : (.text)
+0x000008F0 : (.text)
+0x0000092C : _strtoul0
+0x000009FF : (.text)
+0x00000A27 : _vsprintf
 0x00000000 : (.data)
 0x00000000 : (.data)
 0x00000000 : (.data)

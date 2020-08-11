@@ -755,6 +755,169 @@ L48:
 L45:
 	leave
 	ret
+	.balign 2
+.globl _init_gdtidt
+	.def	_init_gdtidt;	.scl	2;	.type	32;	.endef
+_init_gdtidt:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$24, %esp
+	movl	$2555904, -4(%ebp)
+	movl	$2553856, -8(%ebp)
+	movl	$0, -12(%ebp)
+L58:
+	cmpl	$8191, -12(%ebp)
+	jle	L61
+	jmp	L59
+L61:
+	pushl	$0
+	pushl	$0
+	pushl	$0
+	movl	-12(%ebp), %eax
+	sall	$3, %eax
+	addl	-4(%ebp), %eax
+	pushl	%eax
+	call	_set_segmdesc
+	addl	$16, %esp
+	leal	-12(%ebp), %eax
+	incl	(%eax)
+	jmp	L58
+L59:
+	pushl	$16530
+	pushl	$0
+	pushl	$-1
+	movl	-4(%ebp), %eax
+	addl	$8, %eax
+	pushl	%eax
+	call	_set_segmdesc
+	addl	$16, %esp
+	pushl	$16538
+	pushl	$2621440
+	pushl	$524287
+	movl	-4(%ebp), %eax
+	addl	$8, %eax
+	pushl	%eax
+	call	_set_segmdesc
+	addl	$16, %esp
+	subl	$8, %esp
+	pushl	$2555904
+	pushl	$65535
+	call	_load_gdtr
+	addl	$16, %esp
+	movl	$0, -12(%ebp)
+L62:
+	cmpl	$255, -12(%ebp)
+	jle	L65
+	jmp	L63
+L65:
+	pushl	$0
+	pushl	$0
+	pushl	$0
+	movl	-12(%ebp), %eax
+	sall	$3, %eax
+	addl	-8(%ebp), %eax
+	pushl	%eax
+	call	_set_gatedesc
+	addl	$16, %esp
+	leal	-12(%ebp), %eax
+	incl	(%eax)
+	jmp	L62
+L63:
+	subl	$8, %esp
+	pushl	$2553856
+	pushl	$2047
+	call	_load_idtr
+	addl	$16, %esp
+	leave
+	ret
+	.balign 2
+.globl _set_segmdesc
+	.def	_set_segmdesc;	.scl	2;	.type	32;	.endef
+_set_segmdesc:
+	pushl	%ebp
+	movl	%esp, %ebp
+	pushl	%ebx
+	cmpl	$1048575, 12(%ebp)
+	jbe	L67
+	leal	20(%ebp), %eax
+	orl	$32768, (%eax)
+	movl	12(%ebp), %eax
+	shrl	$12, %eax
+	movl	%eax, 12(%ebp)
+L67:
+	movl	8(%ebp), %edx
+	movl	12(%ebp), %eax
+	movw	%ax, (%edx)
+	movl	8(%ebp), %edx
+	movl	$-1, %eax
+	andl	16(%ebp), %eax
+	movw	%ax, 2(%edx)
+	movl	8(%ebp), %ecx
+	movl	16(%ebp), %eax
+	movl	%eax, %edx
+	sarl	$16, %edx
+	movb	$-1, %al
+	andl	%edx, %eax
+	movb	%al, 4(%ecx)
+	movl	8(%ebp), %ebx
+	movl	12(%ebp), %eax
+	shrl	$16, %eax
+	movb	%al, %cl
+	andl	$15, %ecx
+	movl	20(%ebp), %eax
+	movl	%eax, %edx
+	sarl	$8, %edx
+	movb	$-16, %al
+	andl	%edx, %eax
+	orl	%ecx, %eax
+	movb	%al, 5(%ebx)
+	movl	8(%ebp), %ecx
+	movl	16(%ebp), %eax
+	movl	%eax, %edx
+	sarl	$24, %edx
+	movb	$-1, %al
+	andl	%edx, %eax
+	movb	%al, 7(%ecx)
+	popl	%ebx
+	popl	%ebp
+	ret
+	.balign 2
+.globl _set_gatedesc
+	.def	_set_gatedesc;	.scl	2;	.type	32;	.endef
+_set_gatedesc:
+	pushl	%ebp
+	movl	%esp, %ebp
+	movl	8(%ebp), %edx
+	movl	$-1, %eax
+	andl	12(%ebp), %eax
+	movw	%ax, (%edx)
+	movl	8(%ebp), %edx
+	movl	16(%ebp), %eax
+	movw	%ax, 2(%edx)
+	movl	8(%ebp), %ecx
+	movl	20(%ebp), %eax
+	movl	%eax, %edx
+	sarl	$8, %edx
+	movb	$-1, %al
+	andl	%edx, %eax
+	movb	%al, 4(%ecx)
+	movl	8(%ebp), %edx
+	movb	$-1, %al
+	andl	20(%ebp), %eax
+	movb	%al, 5(%edx)
+	movl	8(%ebp), %ecx
+	movl	12(%ebp), %eax
+	movl	%eax, %edx
+	sarl	$16, %edx
+	movl	$-1, %eax
+	andl	%edx, %eax
+	movw	%ax, 6(%ecx)
+	popl	%ebp
+	ret
+	.def	_load_idtr;	.scl	2;	.type	32;	.endef
+	.def	_set_gatedesc;	.scl	2;	.type	32;	.endef
+	.def	_load_gdtr;	.scl	2;	.type	32;	.endef
+	.def	_set_segmdesc;	.scl	2;	.type	32;	.endef
 	.def	_io_store_eflags;	.scl	2;	.type	32;	.endef
 	.def	_io_out8;	.scl	2;	.type	32;	.endef
 	.def	_io_cli;	.scl	2;	.type	32;	.endef
