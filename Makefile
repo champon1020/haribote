@@ -20,7 +20,6 @@ FUNC = ./src/naskfunc.nas
 ASM_BIN = ./build/asmhead.bin
 SYS = ./build/haribote.sys
 
-BOTPAK = ./src/bootpack.c
 HRB = ./build/bootpack.hrb
 IMG = ./src/haribote.img
 
@@ -37,24 +36,24 @@ img: $(BIN) $(SYS)
 		copy from:$(SYS) to:@: \
 		imgout:$(IMG)
 
-bootpack.gas: $(BOTPAK)
-	$(CC1) -o ./tmp/$@ $<
+%.gas: ./src/%.c
+	$(CC1) -o ./tmp/$*.gas ./src/$*.c
 
-bootpack.nas: ./tmp/bootpack.gas
-	$(GAS2NASK) $< ./tmp/$@
+%.nas: ./tmp/%.gas
+	$(GAS2NASK) ./tmp/$*.gas ./tmp/$*.nas
 
-bootpack.obj: ./tmp/bootpack.nas
-	$(NASK) $< ./tmp/$@
+%.obj: ./tmp/%.nas
+	$(NASK) ./tmp/$*.nas ./tmp/$*.obj
 
 naskfunc.obj: $(FUNC)
 	$(NASK) $< ./tmp/$@
 
-bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj
+bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj ./tmp/graphic.obj
 	$(OBJ2BIM) @$(RULE_FILE) \
 		out:./tmp/$@ \
 		stack:3136k \
 		map:./tmp/bootpack.map \
-		$< ./tmp/naskfunc.obj ./tmp/hankaku.obj
+		$< ./tmp/naskfunc.obj ./tmp/hankaku.obj ./tmp/graphic.obj
 
 bootpack.hrb: ./tmp/bootpack.bim
 	$(BIM2HRB) $< $(HRB) 0
@@ -65,22 +64,31 @@ hankaku.bin: ./src/hankaku.txt
 hankaku.obj: ./tmp/hankaku.bin
 	$(BIN2OBJ) $< ./tmp/$@ _$(basename $@)
 
+ccompile:
+	@make bootpack.gas
+	@make bootpack.nas
+	@make bootpack.obj
+	@make graphic.gas
+	@make graphic.nas
+	@make graphic.obj
+	@make dsctbl.gas
+	@make dsctbl.nas
+	@make dsctbl.obj
+
 makefont:
 	@make hankaku.bin
 	@make hankaku.obj
 
-compile:
-	@make bootpack.gas
-	@make bootpack.nas
+hrb:
+	@make ccompile
 	@make naskfunc.obj
-	@make bootpack.obj
 	@make makefont
 	@make bootpack.bim
 	@make bootpack.hrb
 
 run:
 	@make bin
-	@make compile
+	@make hrb
 	@make sys
 	@make img
 	qemu-system-i386 -drive file=$(IMG),format=raw,if=floppy
