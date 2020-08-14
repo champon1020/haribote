@@ -40,7 +40,7 @@ L3:
 	pushl	$2621440
 	pushl	$524287
 	movl	-4(%ebp), %eax
-	addl	$8, %eax
+	addl	$16, %eax
 	pushl	%eax
 	call	_set_segmdesc
 	addl	$16, %esp
@@ -72,6 +72,30 @@ L7:
 	pushl	$2553856
 	pushl	$2047
 	call	_load_idtr
+	addl	$16, %esp
+	pushl	$142
+	pushl	$16
+	pushl	$_asm_inthandler21
+	movl	-8(%ebp), %eax
+	addl	$264, %eax
+	pushl	%eax
+	call	_set_gatedesc
+	addl	$16, %esp
+	pushl	$142
+	pushl	$16
+	pushl	$_asm_inthandler27
+	movl	-8(%ebp), %eax
+	addl	$312, %eax
+	pushl	%eax
+	call	_set_gatedesc
+	addl	$16, %esp
+	pushl	$142
+	pushl	$16
+	pushl	$_asm_inthandler2c
+	movl	-8(%ebp), %eax
+	addl	$352, %eax
+	pushl	%eax
+	call	_set_gatedesc
 	addl	$16, %esp
 	leave
 	ret
@@ -159,6 +183,9 @@ _set_gatedesc:
 	movw	%ax, 6(%ecx)
 	popl	%ebp
 	ret
+	.def	_asm_inthandler2c;	.scl	2;	.type	32;	.endef
+	.def	_asm_inthandler27;	.scl	2;	.type	32;	.endef
+	.def	_asm_inthandler21;	.scl	2;	.type	32;	.endef
 	.def	_load_idtr;	.scl	2;	.type	32;	.endef
 	.def	_set_gatedesc;	.scl	2;	.type	32;	.endef
 	.def	_load_gdtr;	.scl	2;	.type	32;	.endef

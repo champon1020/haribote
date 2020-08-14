@@ -5,6 +5,9 @@
 [BITS 32]
 	EXTERN	_load_gdtr
 	EXTERN	_load_idtr
+	EXTERN	_asm_inthandler21
+	EXTERN	_asm_inthandler27
+	EXTERN	_asm_inthandler2c
 [FILE "dsctbl.c"]
 [SECTION .text]
 	ALIGN	2
@@ -46,7 +49,7 @@ L3:
 	PUSH	2621440
 	PUSH	524287
 	MOV	EAX,DWORD [-4+EBP]
-	ADD	EAX,8
+	ADD	EAX,16
 	PUSH	EAX
 	CALL	_set_segmdesc
 	ADD	ESP,16
@@ -78,6 +81,30 @@ L7:
 	PUSH	2553856
 	PUSH	2047
 	CALL	_load_idtr
+	ADD	ESP,16
+	PUSH	142
+	PUSH	16
+	PUSH	_asm_inthandler21
+	MOV	EAX,DWORD [-8+EBP]
+	ADD	EAX,264
+	PUSH	EAX
+	CALL	_set_gatedesc
+	ADD	ESP,16
+	PUSH	142
+	PUSH	16
+	PUSH	_asm_inthandler27
+	MOV	EAX,DWORD [-8+EBP]
+	ADD	EAX,312
+	PUSH	EAX
+	CALL	_set_gatedesc
+	ADD	ESP,16
+	PUSH	142
+	PUSH	16
+	PUSH	_asm_inthandler2c
+	MOV	EAX,DWORD [-8+EBP]
+	ADD	EAX,352
+	PUSH	EAX
+	CALL	_set_gatedesc
 	ADD	ESP,16
 	LEAVE
 	RET

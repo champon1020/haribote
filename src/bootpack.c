@@ -5,6 +5,10 @@ void HariMain(void)
   struct BOOTINFO *binfo;
   char s[32], mcursor[256];
   int mx, my;
+
+  init_gdtidt();
+  init_pic();
+  io_sti();
   
   init_palette();
   binfo = (struct BOOTINFO *) 0x0ff0;
@@ -17,6 +21,9 @@ void HariMain(void)
 
   sprintf(s, "(%d, %d)", mx, my);
   putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
+
+  io_out8(PIC0_IMR, 0xf9);
+  io_out8(PIC1_IMR, 0xef);
 
   io_hlt();
 }
