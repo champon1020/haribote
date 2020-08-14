@@ -128,6 +128,10 @@ L11:
 	movb	$-1, %al
 	andl	%edx, %eax
 	movb	%al, 4(%ecx)
+	movl	8(%ebp), %edx
+	movb	$-1, %al
+	andl	20(%ebp), %eax
+	movb	%al, 5(%edx)
 	movl	8(%ebp), %ebx
 	movl	12(%ebp), %eax
 	shrl	$16, %eax
@@ -139,7 +143,7 @@ L11:
 	movb	$-16, %al
 	andl	%edx, %eax
 	orl	%ecx, %eax
-	movb	%al, 5(%ebx)
+	movb	%al, 6(%ebx)
 	movl	8(%ebp), %ecx
 	movl	16(%ebp), %eax
 	movl	%eax, %edx
