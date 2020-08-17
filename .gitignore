@@ -2,3 +2,6 @@
 !quem/
 !src/
 *.bin
+
+tmp/
+build/

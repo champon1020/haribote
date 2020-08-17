@@ -24,5 +24,7 @@ void HariMain(void)
   io_out8(PIC0_IMR, 0xf9);
   io_out8(PIC1_IMR, 0xef);
 
-  io_hlt();
+  for(;;) {
+    io_hlt();
+  }
 }
