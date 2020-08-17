@@ -22,7 +22,7 @@ VRAM    EQU     0x0ff8      ; start address of graphic buffer
         MOV     BYTE [VMODE],8
         MOV     WORD [SCRNX],320
         MOV     WORD [SCRNY],200
-        MOV     DWORD [VRAM],0x00a0000
+        MOV     DWORD [VRAM],0x000a0000
 
 ; LED state of keyboard
 
@@ -33,9 +33,9 @@ VRAM    EQU     0x0ff8      ; start address of graphic buffer
 ; I don't know about following codes...
 
         MOV     AL,0xff
-        OUT     0x21,Al
+        OUT     0x21,AL
         NOP
-        OUT     0xa1,Al
+        OUT     0xa1,AL
 
         CLI
 
@@ -122,7 +122,7 @@ GDT0:
 
         DW      0
 GDTR0:
-        DW      8*301
+        DW      8*3-1
         DD      GDT0
 
         ALIGNB  16

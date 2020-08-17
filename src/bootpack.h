@@ -19,7 +19,10 @@
 
 /* asmhead.nas */
 struct BOOTINFO {
-  char cyls, leds, vmode, reserve;
+  char cyls;
+  char leds;
+  char vmode;
+  char reserve;
   short scrnx, scrny;
   char *vram;
 };
@@ -27,10 +30,12 @@ struct BOOTINFO {
 /* naskfunc.nas */
 void io_hlt(void);
 void io_cli(void);
+void io_sti(void);
+int io_in8(int port);
 void io_out8(int port, int data);
 int io_load_eflags(void);
 void io_store_eflags(int eflags);
-void load_tdtr(int limit, int addr);
+void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
 void asm_inthandler21(void);
 void asm_inthandler27(void);
@@ -38,7 +43,7 @@ void asm_inthandler2c(void);
 
 /* graphic.c */
 void init_palette(void);
-void init_screen(char *vram, int x, int y);
+void init_screen8(char *vram, int x, int y);
 void init_mouse_cursor8(char *mouse, char bc);
 void set_palette(int start, int end, unsigned char *rgb);
 void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
@@ -46,11 +51,11 @@ void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
 void putblock8_8(char *vram, int vxsize, int pxsize, int pysize, int px0, int py0, char *buf, int bxsize);
 
-#define ADR_IDT 0x0026f800
-#define LIMIT_IDT 0x000007ff
-#define ADR_GDT 0x00270000
-#define LIMIT_GDT 0x0000ffff
-#define ADR_BOTPAK 0x00280000
+#define ADR_IDT      0x0026f800
+#define LIMIT_IDT    0x000007ff
+#define ADR_GDT      0x00270000
+#define LIMIT_GDT    0x0000ffff
+#define ADR_BOTPAK   0x00280000
 #define LIMIT_BOTPAK 0x0007ffff
 #define AR_DATA32_RW 0x4092
 #define AR_CODE32_ER 0x409a

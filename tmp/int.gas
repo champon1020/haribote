@@ -71,7 +71,7 @@ _init_pic:
 	ret
 	.data
 LC0:
-	.ascii "INT 21 (TRQ-1) : PS/2 keyboard\0"
+	.ascii "%02X\0"
 	.text
 	.balign 2
 .globl _inthandler21
@@ -79,14 +79,33 @@ LC0:
 _inthandler21:
 	pushl	%ebp
 	movl	%esp, %ebp
-	subl	$8, %esp
+	subl	$24, %esp
 	movl	$4080, -4(%ebp)
+	subl	$8, %esp
+	pushl	$97
+	pushl	$32
+	call	_io_out8
+	addl	$16, %esp
+	subl	$12, %esp
+	pushl	$96
+	call	_io_in8
+	addl	$16, %esp
+	movb	%al, -5(%ebp)
 	subl	$4, %esp
+	movl	$0, %eax
+	movb	-5(%ebp), %al
+	pushl	%eax
+	pushl	$LC0
+	leal	-12(%ebp), %eax
+	pushl	%eax
+	call	_sprintf
+	addl	$16, %esp
+	subl	$4, %esp
+	pushl	$31
 	pushl	$15
-	pushl	$255
+	pushl	$16
 	pushl	$0
-	pushl	$0
-	pushl	$0
+	pushl	$14
 	movl	-4(%ebp), %eax
 	movswl	4(%eax),%eax
 	pushl	%eax
@@ -95,9 +114,10 @@ _inthandler21:
 	call	_boxfill8
 	addl	$32, %esp
 	subl	$8, %esp
-	pushl	$LC0
+	leal	-12(%ebp), %eax
+	pushl	%eax
 	pushl	$7
-	pushl	$0
+	pushl	$16
 	pushl	$0
 	movl	-4(%ebp), %eax
 	movswl	4(%eax),%eax
@@ -106,7 +126,6 @@ _inthandler21:
 	pushl	8(%eax)
 	call	_putfonts8_asc
 	addl	$32, %esp
-	call	_io_hlt
 	leave
 	ret
 	.data
@@ -166,4 +185,6 @@ _inthandler27:
 	.def	_io_hlt;	.scl	2;	.type	32;	.endef
 	.def	_putfonts8_asc;	.scl	2;	.type	32;	.endef
 	.def	_boxfill8;	.scl	2;	.type	32;	.endef
+	.def	_sprintf;	.scl	2;	.type	32;	.endef
+	.def	_io_in8;	.scl	2;	.type	32;	.endef
 	.def	_io_out8;	.scl	2;	.type	32;	.endef

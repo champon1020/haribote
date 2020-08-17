@@ -87,6 +87,7 @@ fin:
 
 error:
 		MOV		SI,msg
+        
 putloop:
 		MOV		AL,[SI]
 		ADD		SI,1			; SIに1を足す
@@ -96,6 +97,7 @@ putloop:
 		MOV		BX,15			; カラーコード
 		INT		0x10			; ビデオBIOS呼び出し
 		JMP		putloop
+        
 msg:
 		DB		0x0a, 0x0a		; 改行を2つ
 		DB		"load error"

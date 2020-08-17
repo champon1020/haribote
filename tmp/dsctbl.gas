@@ -11,7 +11,7 @@ _init_gdtidt:
 	movl	$2553856, -8(%ebp)
 	movl	$0, -12(%ebp)
 L2:
-	cmpl	$8191, -12(%ebp)
+	cmpl	$65535, -12(%ebp)
 	jle	L5
 	jmp	L3
 L5:
@@ -51,7 +51,7 @@ L3:
 	addl	$16, %esp
 	movl	$0, -12(%ebp)
 L6:
-	cmpl	$255, -12(%ebp)
+	cmpl	$2047, -12(%ebp)
 	jle	L9
 	jmp	L7
 L9:

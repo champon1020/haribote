@@ -4,6 +4,8 @@
 [OPTION 1]
 [BITS 32]
 	EXTERN	_io_out8
+	EXTERN	_io_in8
+	EXTERN	_sprintf
 	EXTERN	_boxfill8
 	EXTERN	_putfonts8_asc
 	EXTERN	_io_hlt
@@ -79,21 +81,40 @@ _init_pic:
 	RET
 [SECTION .data]
 LC0:
-	DB	"INT 21 (TRQ-1) : PS/2 keyboard",0x00
+	DB	"%02X",0x00
 [SECTION .text]
 	ALIGN	2
 	GLOBAL	_inthandler21
 _inthandler21:
 	PUSH	EBP
 	MOV	EBP,ESP
-	SUB	ESP,8
+	SUB	ESP,24
 	MOV	DWORD [-4+EBP],4080
+	SUB	ESP,8
+	PUSH	97
+	PUSH	32
+	CALL	_io_out8
+	ADD	ESP,16
+	SUB	ESP,12
+	PUSH	96
+	CALL	_io_in8
+	ADD	ESP,16
+	MOV	BYTE [-5+EBP],AL
 	SUB	ESP,4
+	MOV	EAX,0
+	MOV	AL,BYTE [-5+EBP]
+	PUSH	EAX
+	PUSH	LC0
+	LEA	EAX,DWORD [-12+EBP]
+	PUSH	EAX
+	CALL	_sprintf
+	ADD	ESP,16
+	SUB	ESP,4
+	PUSH	31
 	PUSH	15
-	PUSH	255
+	PUSH	16
 	PUSH	0
-	PUSH	0
-	PUSH	0
+	PUSH	14
 	MOV	EAX,DWORD [-4+EBP]
 	MOVSX	EAX,WORD [4+EAX]
 	PUSH	EAX
@@ -102,9 +123,10 @@ _inthandler21:
 	CALL	_boxfill8
 	ADD	ESP,32
 	SUB	ESP,8
-	PUSH	LC0
+	LEA	EAX,DWORD [-12+EBP]
+	PUSH	EAX
 	PUSH	7
-	PUSH	0
+	PUSH	16
 	PUSH	0
 	MOV	EAX,DWORD [-4+EBP]
 	MOVSX	EAX,WORD [4+EAX]
@@ -113,7 +135,6 @@ _inthandler21:
 	PUSH	DWORD [8+EAX]
 	CALL	_putfonts8_asc
 	ADD	ESP,32
-	CALL	_io_hlt
 	LEAVE
 	RET
 [SECTION .data]

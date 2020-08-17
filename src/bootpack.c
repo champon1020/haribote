@@ -2,8 +2,8 @@
 
 void HariMain(void)
 {
-  struct BOOTINFO *binfo;
-  char s[32], mcursor[256];
+  struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
+  char s[40], mcursor[256];
   int mx, my;
 
   init_gdtidt();
@@ -11,8 +11,7 @@ void HariMain(void)
   io_sti();
   
   init_palette();
-  binfo = (struct BOOTINFO *) 0x0ff0;
-  init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
+  init_screen8(binfo->vram, binfo->scrnx, binfo->scrny);
   init_mouse_cursor8(mcursor, COL8_008484);
 
   mx = (binfo->scrnx - 16) / 2;
