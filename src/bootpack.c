@@ -2,6 +2,9 @@
 
 extern struct FIFO8 keyfifo;
 
+void init_keyboard(void);
+void enable_mouse(void);
+
 void HariMain(void)
 {
   struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
@@ -11,11 +14,12 @@ void HariMain(void)
   init_gdtidt();
   init_pic();
   io_sti();
-	
+
+	fifo8_init(&keyfifo, 32, keybuf);
   io_out8(PIC0_IMR, 0xf9);
   io_out8(PIC1_IMR, 0xef);
-  fifo8_init(&keyfifo, 32, keybuf);
-	
+
+	init_keyboard();
   init_palette();
   init_screen8(binfo->vram, binfo->scrnx, binfo->scrny);
   init_mouse_cursor8(mcursor, COL8_008484);
@@ -26,6 +30,8 @@ void HariMain(void)
 
   sprintf(s, "(%d, %d)", mx, my);
   putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
+
+	enable_mouse();
 
   for(;;) {
 		io_cli();
@@ -41,3 +47,40 @@ void HariMain(void)
 	}
 }
 
+#define PORT_KEYDAT 0x0060
+#define PORT_KEYSTA 0x0064
+#define PORT_KEYCMD 0x0064
+#define KEYSTA_SEND_NOTREADY 0x02
+#define KEYCMD_WRITE_MODE 0x60
+#define KBC_MODE 0x47
+
+void wait_KBC_sendready(void)
+{
+	for (;;) {
+		if ((io_in8(PORT_KEYSTA) & KEYSTA_SEND_NOTREADY) == 0) {
+			break;
+		}
+	}
+	return;
+}
+
+void init_keyboard(void)
+{
+	wait_KBC_sendready();
+	io_out8(PORT_KEYCMD, KEYCMD_WRITE_MODE);
+	wait_KBC_sendready();
+	io_out8(PORT_KEYDAT, KBC_MODE);
+	return;
+}
+
+#define KEYCMD_SENDTO_MOUSE 0xd4
+#define MOUSECMD_ENABLE 0xf4
+
+void enable_mouse(void)
+{
+	wait_KBC_sendready();
+	io_out8(PORT_KEYCMD, KEYCMD_SENDTO_MOUSE);
+	wait_KBC_sendready();
+	io_out8(PORT_KEYDAT, MOUSECMD_ENABLE);
+	return;
+}

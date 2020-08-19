@@ -34,13 +34,14 @@ void inthandler21(int *esp)
 	return;
 }
 
-
 void inthandler2c(int *esp)
 {
   struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
   boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32 * 8 - 1, 15);
   putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, "INT 2c (TRQ-12) : PS/2 mouse");
-  io_hlt();
+	for(;;) {
+		io_hlt();
+	}
 }
 
 void inthandler27(int *exp)
