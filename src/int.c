@@ -2,6 +2,8 @@
 
 #define PORT_KEYDAT 0x0060
 
+struct FIFO8 keyfifo;
+
 void init_pic(void)
 {
   io_out8(PIC0_IMR, 0xff);
@@ -25,15 +27,11 @@ void init_pic(void)
 
 void inthandler21(int *esp)
 {
-  struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-  unsigned char data, s[4];
-
+  unsigned char data;
   io_out8(PIC0_OCW2, 0x61);
   data = io_in8(PORT_KEYDAT);
-  sprintf(s, "%02X", data);
-  boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
-  putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-  return;
+	fifo8_put(&keyfifo, data);
+	return;
 }
 
 

@@ -54,7 +54,7 @@ bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj ./tmp/graphic.obj
 		stack:3136k \
 		map:./tmp/bootpack.map \
 		$< ./tmp/naskfunc.obj ./tmp/hankaku.obj ./tmp/graphic.obj \
-		./tmp/dsctbl.obj ./tmp/int.obj
+		./tmp/dsctbl.obj ./tmp/int.obj ./tmp/fifo.obj
 
 bootpack.hrb: ./tmp/bootpack.bim
 	$(BIM2HRB) $< $(HRB) 0
@@ -78,6 +78,9 @@ ccompile:
 	@make int.gas
 	@make int.nas
 	@make int.obj
+	@make fifo.gas
+	@make fifo.nas
+	@make fifo.obj
 
 makefont:
 	@make hankaku.bin
