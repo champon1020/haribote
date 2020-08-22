@@ -13,6 +13,7 @@ BIM2HRB = $(TOOLS)/bim2hrb
 BIN2OBJ = $(TOOLS)/bin2obj
 MKFONT = $(TOOLS)/makefont
 
+CFILES = src/*.c
 IPL = ./src/ipl.nas
 BIN = ./build/ipl.bin
 ASM = ./src/asmhead.nas
@@ -48,12 +49,13 @@ img: $(BIN) $(SYS)
 naskfunc.obj: $(FUNC)
 	$(NASK) $< ./tmp/$@
 
-bootpack.bim: ./tmp/bootpack.obj ./tmp/naskfunc.obj ./tmp/graphic.obj
+bootpack.bim:
 	$(OBJ2BIM) @$(RULE_FILE) \
 		out:./tmp/$@ \
 		stack:3136k \
 		map:./tmp/bootpack.map \
-		$< ./tmp/naskfunc.obj ./tmp/hankaku.obj ./tmp/graphic.obj \
+		$< ./tmp/*.obj
+#$< ./tmp/naskfunc.obj ./tmp/hankaku.obj ./tmp/graphic.obj \
 		./tmp/dsctbl.obj ./tmp/int.obj ./tmp/fifo.obj
 
 bootpack.hrb: ./tmp/bootpack.bim
@@ -66,21 +68,11 @@ hankaku.obj: ./tmp/hankaku.bin
 	$(BIN2OBJ) $< ./tmp/$@ _$(basename $@)
 
 ccompile:
-	@make bootpack.gas
-	@make bootpack.nas
-	@make bootpack.obj
-	@make graphic.gas
-	@make graphic.nas
-	@make graphic.obj
-	@make dsctbl.gas
-	@make dsctbl.nas
-	@make dsctbl.obj
-	@make int.gas
-	@make int.nas
-	@make int.obj
-	@make fifo.gas
-	@make fifo.nas
-	@make fifo.obj
+	@for file in $(CFILES); do \
+		make "$$(basename $${file%.*}).gas"; \
+		make "$$(basename $${file%.*}).nas"; \
+		make "$$(basename $${file%.*}).obj"; \
+	done
 
 makefont:
 	@make hankaku.bin
