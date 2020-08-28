@@ -90,7 +90,7 @@ run:
 	@make hrb
 	@make sys
 	@make img
-	qemu-system-i386 -drive file=$(IMG),format=raw,if=floppy
+	qemu-system-i386 -m 32 -drive file=$(IMG),format=raw,if=floppy
 
 clean:
 	rm ./build/*
