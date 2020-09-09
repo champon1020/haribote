@@ -1,4 +1,5 @@
 #include "bootpack.h"
+#include <stdio.h>
 
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title)
 {
@@ -51,7 +52,7 @@ void make_window8(unsigned char *buf, int xsize, int ysize, char *title)
 
 void HariMain(void)
 {
-	unsigned int memtotal;
+	unsigned int memtotal, count = 0;
 	struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
   struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
 	struct MOUSE_DEC mdec;
@@ -83,15 +84,13 @@ void HariMain(void)
   sht_mouse = sheet_alloc(shtctl);
   sht_win = sheet_alloc(shtctl);
   buf_back = (unsigned char *) memman_alloc_4k(memman, binfo->scrnx * binfo->scrny);
-  buf_win = (unsigned char *) memman_alloc_4k(memman, 160*80);
+  buf_win = (unsigned char *) memman_alloc_4k(memman, 160*52);
   sheet_setbuf(sht_back, buf_back, binfo->scrnx, binfo->scrny, -1);
   sheet_setbuf(sht_mouse, buf_mouse, 16, 16, 99);
-  sheet_setbuf(sht_win, buf_win, 160, 68, -1);
+  sheet_setbuf(sht_win, buf_win, 160, 52, -1);
   init_screen8(buf_back, binfo->scrnx, binfo->scrny);
   init_mouse_cursor8(buf_mouse, 99);
-  make_window8(buf_win, 160, 68, "window");
-  putfonts8_asc(buf_win, 160, 24, 28, COL8_000000, "Welcome to");
-  putfonts8_asc(buf_win, 160, 24, 44, COL8_000000, " Haribote-OS!");
+  make_window8(buf_win, 160, 52, "counter");
   sheet_slide(sht_back, 0, 0);
 
   mx = (binfo->scrnx - 16) / 2;
@@ -110,9 +109,15 @@ void HariMain(void)
   sheet_refresh(sht_back, 0, 0, binfo->scrnx, 48);
 
   for(;;) {
+    count++;
+    sprintf(s, "%010d", count);
+    boxfill8(buf_win, 160, COL8_C6C6C6, 40, 28, 119, 43);
+    putfonts8_asc(buf_win, 160, 40, 28, COL8_000000, s);
+    sheet_refresh(sht_win, 0, 0, binfo->scrnx, 48);
+    
 		io_cli();
 		if(fifo8_status(&keyfifo) + fifo8_status(&mousefifo) == 0){
-			io_stihlt();
+			//io_stihlt();
 		} else {
 			if(fifo8_status(&keyfifo) != 0) {
 				i = fifo8_get(&keyfifo);
