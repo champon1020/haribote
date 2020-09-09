@@ -113,11 +113,12 @@ void HariMain(void)
     sprintf(s, "%010d", count);
     boxfill8(buf_win, 160, COL8_C6C6C6, 40, 28, 119, 43);
     putfonts8_asc(buf_win, 160, 40, 28, COL8_000000, s);
-    sheet_refresh(sht_win, 0, 0, binfo->scrnx, 48);
+    sheet_refresh(sht_win, 40, 28, 120, 44);
     
 		io_cli();
 		if(fifo8_status(&keyfifo) + fifo8_status(&mousefifo) == 0){
 			//io_stihlt();
+      io_sti();
 		} else {
 			if(fifo8_status(&keyfifo) != 0) {
 				i = fifo8_get(&keyfifo);
