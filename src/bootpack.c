@@ -69,6 +69,10 @@ void HariMain(void)
   io_sti();
   fifo8_init(&keyfifo, 32, keybuf);
   fifo8_init(&mousefifo, 32, mousebuf);
+
+  init_pit();
+  io_out8(PIC0_IMR, 0xf8);
+  io_out8(PIC1_IMR, 0xef);
   /* timer */  
   fifo8_init(&timerfifo, 8, timerbuf);
   timer = timer_alloc();
@@ -84,10 +88,6 @@ void HariMain(void)
   timer3 = timer_alloc();
   timer_init(timer3, &timerfifo3, 1);
   timer_settime(timer3, 50);
-  
-  init_pit();
-  io_out8(PIC0_IMR, 0xf8);
-  io_out8(PIC1_IMR, 0xef);
 
 	init_keyboard();
 	enable_mouse(&mdec);
