@@ -184,14 +184,14 @@ struct TIMER {
   unsigned char data;
 };
 struct TIMERCTL {
-  unsigned int count, next;
-  struct TIMER timer[MAX_TIMER];
+  unsigned int count, next, using;
+  struct TIMER *timers[MAX_TIMER];
+  struct TIMER timers0[MAX_TIMER];
 };
 extern struct TIMERCTL timerctl;
 void init_pit(void);
-void inthandler20(int *esp);
 struct TIMER *timer_alloc(void);
 void timer_free(struct TIMER *timer);
 void timer_init(struct TIMER *timer, struct FIFO8 *fifo, unsigned char data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
-
+void inthandler20(int *esp);
