@@ -22,7 +22,7 @@ void HariMain(void)
   init_gdtidt();
   init_pic();
   io_sti();
-  fifo32_init(&fifo, 1024, fifobuf);
+  fifo32_init(&fifo, 128, fifobuf);
   init_pit();
 	init_keyboard(&fifo, 256);
 	enable_mouse(&fifo, 512, &mdec);  
@@ -33,11 +33,9 @@ void HariMain(void)
   timer = timer_alloc();
   timer_init(timer, &fifo, 10);
   timer_settime(timer, 1000);
-  /* timer2 */  
   timer2 = timer_alloc();
   timer_init(timer2, &fifo, 3);
   timer_settime(timer2, 300);
-  /* timer3 */
   timer3 = timer_alloc();
   timer_init(timer3, &fifo, 1);
   timer_settime(timer3, 50);
@@ -46,7 +44,7 @@ void HariMain(void)
 	memman_init(memman);
 	memman_free(memman, 0x00001000, 0x0009e000);
 	memman_free(memman, 0x00400000, memtotal - 0x00400000);
-		
+  
   init_palette();
   shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
   sht_back = sheet_alloc(shtctl);
@@ -54,18 +52,13 @@ void HariMain(void)
   sht_win = sheet_alloc(shtctl);
   buf_back = (unsigned char *) memman_alloc_4k(memman, binfo->scrnx * binfo->scrny);
   buf_win = (unsigned char *) memman_alloc_4k(memman, 160*52);
-
-  // Set buffer to sheet.
   sheet_setbuf(sht_back, buf_back, binfo->scrnx, binfo->scrny, -1);
   sheet_setbuf(sht_mouse, buf_mouse, 16, 16, 99);
   sheet_setbuf(sht_win, buf_win, 160, 52, -1);
-  // Initialize screen.
   init_screen8(buf_back, binfo->scrnx, binfo->scrny);
-  // Initialize cursor.
   init_mouse_cursor8(buf_mouse, 99);
   make_window8(buf_win, 160, 52, "counter");
   sheet_slide(sht_back, 0, 0);
-
   mx = (binfo->scrnx - 16) / 2;
   my = (binfo->scrny - 28 - 16) / 2;
   sheet_slide(sht_mouse, mx, my);
@@ -80,14 +73,12 @@ void HariMain(void)
 
   for(;;) {
     count++;
-    sprintf(s, "%d", fifo32_status(&fifo));
-    putfonts8_asc_sht(sht_win, 40, 28, COL8_000000, COL8_C6C6C6, s, 10);    
     
 		io_cli();    
 		if(fifo32_status(&fifo) == 0){
       io_sti();
 		} else {
-      i = fifo32_status(&fifo);
+      i = fifo32_get(&fifo);
       io_sti();      
 			if(256 <= i && i <= 511) {
         // Draw the keyboard click event.        
@@ -203,7 +194,7 @@ void make_window8(unsigned char *buf, int xsize, int ysize, char *title)
 void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l)
 {
   boxfill8(sht->buf, sht->bxsize, b, x, y, x+l*8-1, y+15);
-  putfonts8_asc((char *)sht->buf, sht->bxsize, x, y, c, (unsigned char *)s);
+  putfonts8_asc(sht->buf, sht->bxsize, x, y, c, s);
   sheet_refresh(sht, x, y, x+l*8, y+16);
   return;
 }
