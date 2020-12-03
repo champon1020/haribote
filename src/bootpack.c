@@ -67,6 +67,9 @@ void HariMain(void)
   init_screen8(buf_back, binfo->scrnx, binfo->scrny);
   init_mouse_cursor8(buf_mouse, 99);
   make_window8(buf_win, 160, 52, "window");
+  make_textbox8(sht_win, 8, 28, 144, 16, COL8_FFFFFF);
+  cursor_x = 8;
+  cursor_c = COL8_FFFFFF;  
   sheet_slide(sht_back, 0, 0);
   mx = (binfo->scrnx - 16) / 2;
   my = (binfo->scrny - 28 - 16) / 2;
@@ -79,10 +82,6 @@ void HariMain(void)
   putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF, COL8_008484, s, 10);
 	sprintf(s, "memory %dMB  free : %dKB", memtotal / (1024 * 1024), memman_total(memman) / 1024);
   putfonts8_asc_sht(sht_back, 0, 32, COL8_FFFFFF, COL8_008484, s, 40);
-
-  make_textbox8(sht_win, 8, 28, 144, 16, COL8_FFFFFF);
-  cursor_x = 8;
-  cursor_c = COL8_FFFFFF;
 
   for(;;) {
 		io_cli();    
@@ -99,12 +98,12 @@ void HariMain(void)
           if(keytable[i-256] != 0) {
             s[0] = keytable[i-256];
             s[1] = 0;
-            putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_C6C6C6, s, 1);
+            putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_FFFFFF, s, 1);
             cursor_x += 8;
           }
         }
         if(i == 256 + 0x0e && cursor_x > 0) {
-          putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_C6C6C6, " ", 1);
+          putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_FFFFFF, " ", 1);
           cursor_x -= 8;
         }
         boxfill8(sht_win->buf, sht_win->bxsize, cursor_c, cursor_x, 28, cursor_x+7, 43);
