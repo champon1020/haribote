@@ -3,7 +3,7 @@
 
 [INSTRSET "i486p"]
 
-VBMODE  EQU     0x105
+VBEMODE  EQU     0x105
 ; Display mode list
 ;	0x100 :  640 x  400 x 8bit
 ;	0x101 :  640 x  480 x 8bit
@@ -105,7 +105,7 @@ keystatus:
         OUT     0x60,AL
         CALL    waitkbdout
 
-[INSTRSET "i486p"]
+;; Protect mode
 
         LGDT    [GDTR0]
         MOV     EAX,CR0
