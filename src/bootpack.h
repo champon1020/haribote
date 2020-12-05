@@ -191,3 +191,8 @@ struct TSS32 {
   int es, cs, ss, ds, fs, gs;
   int ldtr, iomap;
 };
+
+/* mtask.c */
+extern struct TIMER *mt_timer;
+void mt_init(void);
+void mt_taskswitch(void);
