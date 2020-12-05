@@ -16,7 +16,7 @@
     EXTERN  _inthandler20, _inthandler21, _inthandler27, _inthandler2c
     GLOBAL  _load_cr0, _store_cr0
     GLOBAL  _memtest_sub
-    GLOBAL  _taskswitch3, _taskswitch4
+    GLOBAL  _farjmp
 
 [SECTION .text]
 
@@ -205,10 +205,6 @@ mts_fin:
     POP     EDI
     RET
 
-_taskswitch3:
-    JMP     3*8:0
-    RET
-    
-_taskswitch4:
-    JMP     4*8:0
+_farjmp:
+    JMP     FAR [ESP+4]
     RET
